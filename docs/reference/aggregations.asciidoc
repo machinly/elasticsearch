@@ -1,49 +1,34 @@
 [[search-aggregations]]
-= Aggregations
+= 聚合
 
 [partintro]
 --
-The aggregations framework helps provide aggregated data based on a search query. It is based on simple building blocks
-called aggregations, that can be composed in order to build complex summaries of the data.
+聚合框架提供了基于搜索查询的数据聚合功能。它由一些简单的聚合模块构成，通过组合这些模块可以构造出复杂的数据集。
 
-An aggregation can be seen as a _unit-of-work_ that builds analytic information over a set of documents. The context of
-the execution defines what this document set is (e.g. a top-level aggregation executes within the context of the executed
-query/filters of the search request).
+聚合模块可以看作是一组文档分析信息构造工作中的一环。执行的上下文确定了这组文档的内容（例如：最顶层的聚合会在搜索请求执行查询或者过滤的上下文中执行）。
 
-There are many different types of aggregations, each with its own purpose and output. To better understand these types,
-it is often easier to break them into four main families:
+在 ElasticSearch 中有很多不同类型的聚合组件，每一个组件都有其独特的意义与输出。为了更好地理解这些类型，通常简单地将它们分为四个大类。
 
-<<search-aggregations-bucket, _Bucketing_>>::
-				A family of aggregations that build buckets, where each bucket is associated with a _key_ and a document
-				criterion. When the aggregation is executed, all the buckets criteria are evaluated on every document in
-				the context and when a criterion matches, the document is considered to "fall in" the relevant bucket.
-				By the end of the aggregation process, we'll end up with a list of buckets - each one with a set of
-				documents that "belong" to it.
+<<search-aggregations-bucket, _分桶（Bucketing）_>>::
+				用来构建 bucket 的一组聚合模块，其中每个 bucket 与 _key_ 和文档规则相关联。当执行聚合时，上下文中的每个文档都会与每个 bucket 逐一进行条件匹配，当匹配中时，文档就会”掉入”那个 bucket 中。在聚合完成时，我们将得到一个 bucket 列表，其中每个 bucket 都有一组“属于”它的文档。
+                
+<<search-aggregations-metrics, _指标（Metric）_>>::
+                用来跟踪一组文档并计算其指标的聚合模块。
 
-<<search-aggregations-metrics, _Metric_>>::
-				Aggregations that keep track and compute metrics over a set of documents.
+<<search-aggregations-matrix, _矩阵（Matrix）_>>::
+                这组聚合模块会在多个字段上进行操作并生成一个矩阵，这个生成过程使用的基础数据是从请求文档的字段中提取的。与指标和 bucket 聚合不同，这个组聚合模块暂时还不支持脚本。
 
-<<search-aggregations-matrix, _Matrix_>>::
-                A family of aggregations that operate on multiple fields and produce a matrix result based on the
-                values extracted from the requested document fields. Unlike metric and bucket aggregations, this
-                aggregation family does not yet support scripting.
+<<search-aggregations-pipeline, _管道（Pipeline）_>>::
+                聚合其他聚合模块的输出及其相关的指标的聚合模块。
 
-<<search-aggregations-pipeline, _Pipeline_>>::
-				Aggregations that aggregate the output of other aggregations and their associated metrics
+下面这部分很有趣。由于每个 bucket 有效地定义了一个文档集（属于 bucket 的所有文档），因此可以将 bucket 级别上的聚合关联起来，并且这些聚合将在 bucket 的上下文中执行。这就是聚合蕴含威力的地方：*聚合可以嵌套!*
 
-The interesting part comes next. Since each bucket effectively defines a document set (all documents belonging to
-the bucket), one can potentially associate aggregations on the bucket level, and those will execute within the context
-of that bucket. This is where the real power of aggregations kicks in: *aggregations can be nested!*
-
-NOTE:	Bucketing aggregations can have sub-aggregations (bucketing or metric). The sub-aggregations will be computed for
-		the buckets which their parent aggregation generates. There is no hard limit on the level/depth of nested
-		aggregations (one can nest an aggregation under a "parent" aggregation, which is itself a sub-aggregation of
-		another higher-level aggregation).
+NOTE:   分桶聚合可以有子聚合（分桶聚合或指标聚合）。子聚合将对父聚合生成的 bucket 内容进行运算。聚合嵌套的级别或深度没有强制限制（可以将聚合嵌套在“父”聚合之下，而“父”聚合本身也是另一个高级别聚合的子聚合）。
 
 [float]
-== Structuring Aggregations
+== 聚合的结构
 
-The following snippet captures the basic structure of aggregations:
+下面的代码片段展示了聚合的基本结构:
 
 [source,js]
 --------------------------------------------------
@@ -60,47 +45,25 @@ The following snippet captures the basic structure of aggregations:
 --------------------------------------------------
 // NOTCONSOLE
 
-The `aggregations` object (the key `aggs` can also be used) in the JSON holds the aggregations to be computed. Each aggregation
-is associated with a logical name that the user defines (e.g. if the aggregation computes the average price, then it would
-make sense to name it `avg_price`). These logical names will also be used to uniquely identify the aggregations in the
-response. Each aggregation has a specific type (`<aggregation_type>` in the above snippet) and is typically the first
-key within the named aggregation body. Each type of aggregation defines its own body, depending on the nature of the
-aggregation (e.g. an `avg` aggregation on a specific field will define the field on which the average will be calculated).
-At the same level of the aggregation type definition, one can optionally define a set of additional aggregations,
-though this only makes sense if the aggregation you defined is of a bucketing nature. In this scenario, the
-sub-aggregations you define on the bucketing aggregation level will be computed for all the buckets built by the
-bucketing aggregation. For example, if you define a set of aggregations under the `range` aggregation, the
-sub-aggregations will be computed for the range buckets that are defined.
+JSON 中的 `aggregations` 对象（也可以使用 `aggs` ）保存要进行运算的聚合内容。每个聚合都与用户定义的逻辑名相关联（例如，如果要聚合运算平均价格，那么将其命名为 `avg_price` 是比较合理的）。这些逻辑名还会在返回的内容中作为唯一表示使用。
+
+每个聚合都有一个特定的类型（上面代码片段中的 `<aggregation_type>` ），在声明一个聚合时通常将其作为第一个键值。根据内容聚合的性质的不同，每种类型的聚合都定义了自己的主体（例如，对某个特定字段进行 `avg` 聚合，会有定义要计算平均值的字段)。
+
+在定义聚合类型那一级，可以定义一组额外的聚合，不过仅在你定义的这组聚合具有嵌套性质时才会有意义的。在这中场景中，你在分桶聚合这一层定义的子聚合将被分桶聚合生成的所有 bucket 运行。例如，如果你在 `range` 聚合的下面定义了一组聚合，那么子聚合将会为 `range` bucket 的聚合结果进行聚合运算。
 
 [float]
-=== Values Source
+=== 值（value）的来源
 
-Some aggregations work on values extracted from the aggregated documents. Typically, the values will be extracted from
-a specific document field which is set using the `field` key for the aggregations. It is also possible to define a
-<<modules-scripting,`script`>> which will generate the values (per document).
+有些聚合用于从聚合后的文档中提取的值。通常，这些值会从文档中一个特定的字段提取，在聚合中使用 `field` 键值进行设置。还可以定义一个<<modules-scripting,`脚本（script）`>>，它可以为每个文档生成一些值。
 
-When both `field` and `script` settings are configured for the aggregation, the script will be treated as a
-`value script`.  While normal scripts are evaluated on a document level (i.e. the script has access to all the data
-associated with the document), value scripts are evaluated on the *value* level. In this mode, the values are extracted
-from the configured `field` and the `script` is used to apply a "transformation" over these value/s.
+当为聚合配置 `field` 和 `script` 设置项时，脚本将被视为 `value script` 。普通脚本在文档级别上进行求值（例如，脚本可以访问与文档相关的所有数据），而值脚本（ `value script` ）则在 *value* 级别上进行求值。在这种模式下模式下，需要从已配置的 `field` 中提取值，然后使用 `script` 对这些值进行“变换”。
 
 ["NOTE",id="aggs-script-note"]
 ===============================
-When working with scripts, the `lang` and `params` settings can also be defined. The former defines the scripting
-language which is used (assuming the proper language is available in Elasticsearch, either by default or as a plugin). The latter
-enables defining all the "dynamic" expressions in the script as parameters, which enables the script to keep itself static
-between calls (this will ensure the use of the cached compiled scripts in Elasticsearch).
+在使用脚本时，也可以定义 `lang` 和 `params` 设置项。前者定义了脚本所使用的语言（假定在 Elasticsearch 中可以使用设定的语言，不管是默认存在的，还是插件提供的）。后者允许将脚本中的所有“动态”表达式定义为参数，从而使脚本在被调用时保持静态（这可以确保 Elasticsearch 使用缓存中编译过的脚本）。
 ===============================
 
-Elasticsearch uses the type of the field in the mapping in order to figure out
-how to run the aggregation and format the response. However there are two cases
-in which Elasticsearch cannot figure out this information: unmapped fields (for
-instance in the case of a search request across multiple indices, and only some
-of them have a mapping for the field) and pure scripts. For those cases, it is
-possible to give Elasticsearch a hint using the `value_type` option, which
-accepts the following values: `string`, `long` (works for all integer types),
-`double` (works for all decimal types like `float` or `scaled_float`), `date`,
-`ip` and `boolean`.
+Elasticsearch 会使用字段对应的类型来确定如何对返回的结果进行聚合与格式化。然而，有两种情况下 Elasticsearch 无法找出这些信息：未映射的字段（例如，在跨多个索引的搜索请求中，只有其中一些字段具有类型的对应关系)和纯脚本。对于这些情况，可以使用 `value_type` 选项给 Elasticsearch 一个提示，该选项接受以下值： `string` ， `long` （适用于所有整数类型）， `double` （适用于所有的小数类型，如 `float` 或 `scaled_float` ），`date` ，`ip` and `boolean` 。
 
 --
 
