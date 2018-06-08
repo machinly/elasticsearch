@@ -1,19 +1,15 @@
 
 [[caching-heavy-aggregations]]
-== Caching heavy aggregations
+== 缓存频繁聚合
 
-Frequently used aggregations (e.g. for display on the home page of a website)
-can be cached for faster responses. These cached results are the same results
-that would be returned by an uncached aggregation -- you will never get stale
-results.
+频繁使用的聚合（例如，为网站首页提供展示数据）可以进行缓存以优化响应速度。这些缓存的结果与未缓存的聚合产生的结果是一致的，你永远不会得到过时的结果。
 
-See <<shard-request-cache>> for more details.
+想了解更多的内容可以查看 <<shard-request-cache>> .
 
 [[returning-only-agg-results]]
-== Returning only aggregation results
+== 仅返回聚合的结果
 
-There are many occasions when aggregations are required but search hits are not.  For these cases the hits can be ignored by
-setting `size=0`. For example:
+在很多场景中只需要聚合的结果而不需要搜索的结果。对于这些情况，可以通过设置 `size=0` 来忽略搜索的内容。例如：
 
 [source,js]
 --------------------------------------------------
@@ -32,15 +28,14 @@ GET /twitter/_search
 // CONSOLE
 // TEST[setup:twitter]
 
-Setting `size` to `0` avoids executing the fetch phase of the search making the request more efficient.
+将 `size` 设置为 `0` 可以避免执行搜索的提取阶段，从而提高请求的执行效率。
 
 [[agg-metadata]]
-== Aggregation Metadata
+== 聚合元数据
 
-You can associate a piece of metadata with individual aggregations at request time that will be returned in place
-at response time.
+在进行请求时你可以将一段元数据与一项聚合关联起来，这样他们在响应时将一起返回。
 
-Consider this example where we want to associate the color blue with our `terms` aggregation.
+思考下面这个示例，我们要将颜色值蓝色与聚合 `terms` 关联起来。
 
 [source,js]
 --------------------------------------------------
@@ -62,7 +57,7 @@ GET /twitter/_search
 // CONSOLE
 // TEST[setup:twitter]
 
-Then that piece of metadata will be returned in place for our `titles` terms aggregation
+然后这一段元数据将出现在标题为 `title` 的 `terms` 聚合里。
 
 [source,js]
 --------------------------------------------------
@@ -83,16 +78,13 @@ Then that piece of metadata will be returned in place for our `titles` terms agg
 --------------------------------------------------
 // TESTRESPONSE[s/\.\.\./"took": "$body.took", "timed_out": false, "_shards": "$body._shards", "hits": "$body.hits"/]
 
-
+ 
 [[returning-aggregation-type]]
-== Returning the type of the aggregation
+== 返回聚合的类型
 
-Sometimes you need to know the exact type of an aggregation in order to parse its results. The `typed_keys` parameter
- can be used to change the aggregation's name in the response so that it will be prefixed by its internal type.
+某些时候为了分析聚合结果，你需要知道它确切的类型。参数 `typed_keys` 可以用于更改响应内容中聚合的名称，可以使用这个特性将内部类型作为前缀返回.
 
-Considering the following <<search-aggregations-bucket-datehistogram-aggregation,`date_histogram` aggregation>> named
-`tweets_over_time` which has a sub <<search-aggregations-metrics-top-hits-aggregation, 'top_hits` aggregation>> named
- `top_users`:
+下面例子中，有一个 <<search-aggregations-bucket-datehistogram-aggregation,`date_histogram` 聚合>> 名为 `tweets_over_time`，它有一个子聚合 <<search-aggregations-metrics-top-hits-aggregation, 'top_hits` 聚合>> 名为 `top_users`：
 
 [source,js]
 --------------------------------------------------
@@ -118,8 +110,7 @@ GET /twitter/_search?typed_keys
 // CONSOLE
 // TEST[setup:twitter]
 
-In the response, the aggregations names will be changed to respectively `date_histogram#tweets_over_time` and
-`top_hits#top_users`, reflecting the internal types of each aggregation:
+在响应的内容中，聚合名分别会变为 `date_histogram#tweets_over_time` 和 `top_hits#top_users`，以反应每个聚合的内部类型：
 
 [source,js]
 --------------------------------------------------
@@ -160,11 +151,7 @@ In the response, the aggregations names will be changed to respectively `date_hi
 --------------------------------------------------
 // TESTRESPONSE[s/\.\.\./"took": "$body.took", "timed_out": false, "_shards": "$body._shards", "hits": "$body.hits"/]
 
-<1> The name `tweets_over_time` now contains the `date_histogram` prefix.
-<2> The name `top_users` now contains the `top_hits` prefix.
+<1> 原来名称为 `tweets_over_time` 的现在包含了前缀 `date_histogram` .
+<2> 原来名称为 `top_users` 的现在包含了前缀 `top_hits` .
 
-NOTE: For some aggregations, it is possible that the returned type is not the same as the one provided with the
-request. This is the case for Terms, Significant Terms and Percentiles aggregations, where the returned type
-also contains information about the type of the targeted field: `lterms` (for a terms aggregation on a Long field),
- `sigsterms` (for a significant terms aggregation on a String field), `tdigest_percentiles` (for a percentile
- aggregation based on the TDigest algorithm).
+NOTE: 对于某些聚合来说，可能它反回的类型和请求时提供的类型不同。Terms，Significant Terms 还有百分数（Percentiles）聚合就是这种情况，它们返回的类型中还包含了目标字段类型的信息：`lterms` （支持 Long 字段的 terms 聚合）， `sigsterms` （支持 String 字段的 significant terms 聚合），`tdigest_percentiles` （基于 TDigest 算法的百分数聚合）。
