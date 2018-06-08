@@ -1,9 +1,8 @@
 [[search-aggregations-matrix]]
-== Matrix Aggregations
+== 矩阵聚合（Matrix Aggregations）
 
 experimental[]
 
-The aggregations in this family operate on multiple fields and produce a matrix result based on the values extracted from
-the requested document fields. Unlike metric and bucket aggregations, this aggregation family does not yet support scripting.
+这组聚合模块会在操作多个字段然后生成一个矩阵，这个生成过程使用的基础数据是从请求文档的字段中提取的。与指标和分桶聚合不同，这个组聚合模块暂时还不支持脚本。
 
 include::matrix/stats-aggregation.asciidoc[]
