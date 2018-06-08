@@ -1,21 +1,13 @@
 [[search-aggregations-bucket]]
-== Bucket Aggregations
+== 分桶聚合（Bucket Aggregations）
 
-Bucket aggregations don't calculate metrics over fields like the metrics aggregations do, but instead, they create
-buckets of documents. Each bucket is associated with a criterion (depending on the aggregation type) which determines
-whether or not a document in the current context "falls" into it. In other words, the buckets effectively define document
-sets. In addition to the buckets themselves, the `bucket` aggregations also compute and return the number of documents
-that "fell into" each bucket.
+分桶聚合不向指标聚合那样计算字段的指标，相反地，它会创造一些文档的 bucket。每个 bucket 会与一个规则（取决于聚合的类型）相关联，这个规则确定了当前上下文中的是否“落入”这个 bucket。另一方面，这些 bucket 有效的定义了文档集。除了 bucket 本身之外， `bucket` 聚合还可以计算并返回落入每个 bucket 中的文档的数量。
 
-Bucket aggregations, as opposed to `metrics` aggregations, can hold sub-aggregations. These sub-aggregations will be
-aggregated for the buckets created by their "parent" bucket aggregation.
+分桶聚合与指标聚合还有一个不同点，就是它可以有子聚合。这些子聚合可以对父聚合产生的 bucket 进行聚合。
 
-There are different bucket aggregators, each with a different "bucketing" strategy. Some define a single bucket, some
-define fixed number of multiple buckets, and others dynamically create the buckets during the aggregation process.
+ElasticSearch 中有各种各样的分桶聚合器，每一种都有自己独特的“划分”的策略。其中一些定义了一个 bucket，还有一些定义了固定数量 bucket，而另一些则在聚合过程中动态地创建 bucket。
 
-NOTE: The maximum number of buckets allowed in a single response is limited by a dynamic cluster
-setting named `search.max_buckets`. It is disabled by default (-1) but requests that try to return more than
-10,000 buckets (the default value for future versions) will log a deprecation warning.
+NOTE: 单个响应中允许的 bucket 数量有最大限制，这个限制由于一个名为 `search.max_buckets` 的动态集群设置项控制。默认情况下，它是禁用状态（-1），但当尝试返回超过10,000 个（未来版本的默认值） bucket 的请求将产生一个弃用的警告日志。
 
 include::bucket/adjacency-matrix-aggregation.asciidoc[]
 
