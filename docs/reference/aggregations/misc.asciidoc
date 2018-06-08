@@ -84,7 +84,7 @@ GET /twitter/_search
 
 某些时候为了分析聚合结果，你需要知道它确切的类型。参数 `typed_keys` 可以用于更改响应内容中聚合的名称，可以使用这个特性将内部类型作为前缀返回.
 
-下面例子中，有一个 <<search-aggregations-bucket-datehistogram-aggregation,`date_histogram` 聚合>> 名为 `tweets_over_time`，它有一个子聚合 <<search-aggregations-metrics-top-hits-aggregation, 'top_hits` 聚合>> 名为 `top_users`：
+下面例子中，有一个 <<search-aggregations-bucket-datehistogram-aggregation,`date_histogram` 聚合>> 名为 `tweets_over_time` ，它有一个子聚合 <<search-aggregations-metrics-top-hits-aggregation, `top_hits` 聚合>> 名为 `top_users` ：
 
 [source,js]
 --------------------------------------------------
@@ -110,7 +110,7 @@ GET /twitter/_search?typed_keys
 // CONSOLE
 // TEST[setup:twitter]
 
-在响应的内容中，聚合名分别会变为 `date_histogram#tweets_over_time` 和 `top_hits#top_users`，以反应每个聚合的内部类型：
+在响应的内容中，聚合名分别会变为 `date_histogram#tweets_over_time` 和 `top_hits#top_users` ，以反应每个聚合的内部类型：
 
 [source,js]
 --------------------------------------------------
@@ -151,7 +151,7 @@ GET /twitter/_search?typed_keys
 --------------------------------------------------
 // TESTRESPONSE[s/\.\.\./"took": "$body.took", "timed_out": false, "_shards": "$body._shards", "hits": "$body.hits"/]
 
-<1> 原来名称为 `tweets_over_time` 的现在包含了前缀 `date_histogram` .
-<2> 原来名称为 `top_users` 的现在包含了前缀 `top_hits` .
+<1> 原来名称为 `tweets_over_time` 的现在包含了前缀 `date_histogram` 。
+<2> 原来名称为 `top_users` 的现在包含了前缀 `top_hits` 。
 
 NOTE: 对于某些聚合来说，可能它反回的类型和请求时提供的类型不同。Terms，Significant Terms 还有百分数（Percentiles）聚合就是这种情况，它们返回的类型中还包含了目标字段类型的信息：`lterms` （支持 Long 字段的 terms 聚合）， `sigsterms` （支持 String 字段的 significant terms 聚合），`tdigest_percentiles` （基于 TDigest 算法的百分数聚合）。
