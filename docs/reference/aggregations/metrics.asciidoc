@@ -1,15 +1,9 @@
 [[search-aggregations-metrics]]
-== Metrics Aggregations
+== 指标聚合（Metrics Aggregations）
 
-The aggregations in this family compute metrics based on values extracted in one way or another from the documents that
-are being aggregated. The values are typically extracted from the fields of the document (using the field data), but
-can also be generated using scripts.
+这一类的聚合以值为基础进行指标的统计度量，从被聚合的文档中提取这些值的方法是多种多样的。通常是提取文档的字段（使用字段数据），也可以是使用脚本生成。
 
-Numeric metrics aggregations are a special type of metrics aggregation which output numeric values. Some aggregations output
-a single numeric metric (e.g. `avg`) and are called `single-value numeric metrics aggregation`, others generate multiple
-metrics (e.g. `stats`) and are called `multi-value numeric metrics aggregation`. The distinction between single-value and
-multi-value numeric metrics aggregations plays a role when these aggregations serve as direct sub-aggregations of some
-bucket aggregations (some bucket aggregations enable you to sort the returned buckets based on the numeric metrics in each bucket).
+数字指标聚合是一种输出特殊的指标聚合，这种聚合会输出一些数值。其中有些聚合会输出一个单独的指标（例如 `avg` ），这被称为 `单值数字指标聚合（single-value numeric metrics aggregation）` ，其他生成多个指标的（例如 `stats`） 被称作 `多值数字指标聚合（ulti-value numeric metrics aggregation）` 。当这些聚合作为某个分桶聚合的直接子聚合时，单值和多值数字指标聚合之间的区别将扮演一个特别的角色（某些分桶聚合可以基于每个 bucket 中返回数字指标对 bucket 进行排序）。
 
 include::metrics/avg-aggregation.asciidoc[]
 
