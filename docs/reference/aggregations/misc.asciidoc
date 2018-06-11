@@ -154,4 +154,4 @@ GET /twitter/_search?typed_keys
 <1> 原来名称为 `tweets_over_time` 的现在包含了前缀 `date_histogram` 。
 <2> 原来名称为 `top_users` 的现在包含了前缀 `top_hits` 。
 
-NOTE: 对于某些聚合来说，可能它反回的类型和请求时提供的类型不同。Terms，Significant Terms 还有百分数（Percentiles）聚合就是这种情况，它们返回的类型中还包含了目标字段类型的信息：`lterms` （支持 Long 字段的 terms 聚合）， `sigsterms` （支持 String 字段的 significant terms 聚合），`tdigest_percentiles` （基于 TDigest 算法的百分数聚合）。
+NOTE: 对于某些聚合来说，可能它反回的类型和请求时提供的类型不同。Terms，Significant Terms 还有百分数（Percentiles）聚合就是这种情况，它们返回的类型中还包含了目标字段类型的信息：`lterms` （支持 Long 字段的 terms 聚合），`sigsterms` （支持 String 字段的 significant terms 聚合），`tdigest_percentiles` （基于 TDigest 算法的百分数聚合）。
