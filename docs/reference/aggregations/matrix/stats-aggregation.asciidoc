@@ -10,7 +10,7 @@
 `skewness`:: 偏度，衡量每个字段分布的不对称性。
 `kurtosis`:: 峰度，衡量每个字段分布的形态。
 `covariance`:: 协方差，结果为一个矩阵，它定量地描述了两个字段之间变化的相关性。
-`correlation`:: 相关系数，协方差矩阵缩放到-1到1的范围，闭区间。描述字段分布之间的关系。
+`correlation`:: 相关系数，协方差矩阵缩放到 -1 到 1 的范围，闭区间。描述字段分布之间的关系。
 
 //////////////////////////
 
@@ -101,15 +101,15 @@ GET /_search
 
 ==== 多值字段
 
-The `matrix_stats` aggregation treats each document field as an independent sample. The `mode` parameter controls what
-array value the aggregation will use for array or multi-valued fields. This parameter can take one of the following:
+`matrix_stats` 聚合将每个文档字段视为独立的样本。
+`mode` 参数控制在遇到数组或者多值字段时，讲使用数组中的哪个值。该参数可以使用下列之一:
 
 [horizontal]
-`avg`:: (default) Use the average of all values.
-`min`:: Pick the lowest value.
-`max`:: Pick the highest value.
-`sum`:: Use the sum of all values.
-`median`:: Use the median of all values.
+`avg`:: （默认）使用所有值的均值。
+`min`:: 选取最小的值。
+`max`:: 选取最大的值。
+`sum`:: 使用所有值的总和。
+`median`:: 使用所有值的中值。
 
 ==== 缺失值
 
