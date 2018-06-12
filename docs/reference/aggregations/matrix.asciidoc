@@ -1,5 +1,5 @@
 [[search-aggregations-matrix]]
-== 矩阵聚合（Matrix Aggregations）
+== 矩阵聚合
 
 experimental[]
 
