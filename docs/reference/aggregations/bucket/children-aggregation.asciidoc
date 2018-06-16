@@ -1,13 +1,13 @@
 [[search-aggregations-bucket-children-aggregation]]
-=== Children Aggregation
+=== 子聚合
 
-A special single bucket aggregation that selects child documents that have the specified type, as defined in a <<parent-join,`join` field>>.
+一个特殊的单 bucket 聚合，它会选出特定类型的子文档，这个类型会在 <<parent-join,`join` 字段>> 中指定。
 
-This aggregation has a single option:
+这个聚合只有一个选项:
 
-* `type` - The child type that should be selected.
+* `type` - 要选出的子文档的类型.
 
-For example, let's say we have an index of questions and answers. The answer type has the following `join` field in the mapping:
+举个例子，假设我们有一个关于 question 和 answer 的索引。类型 answer 在字段 `join` 下面的映射中：
 
 [source,js]
 --------------------------------------------------
@@ -29,11 +29,9 @@ PUT child_example
 --------------------------------------------------
 // CONSOLE
 
-The `question` document contain a tag field and the `answer` documents contain an owner field. With the `children`
-aggregation the tag buckets can be mapped to the owner buckets in a single request even though the two fields exist in
-two different kinds of documents.
+`question` 文档包含 tag 字段，`answer` 文档包含 owner 字段。在 `子聚合` 中，即使这两个字段在两个不同类型的文档中，也可以在一次请求中进行 tag bucket 和 owner bucket 的映射。
 
-An example of a question document:
+一个 `question` 文档的例子：
 
 [source,js]
 --------------------------------------------------
@@ -54,7 +52,7 @@ PUT child_example/_doc/1
 // CONSOLE
 // TEST[continued]
 
-Examples of `answer` documents:
+`answer` 文档的例子：
 
 [source,js]
 --------------------------------------------------
@@ -91,7 +89,7 @@ PUT child_example/_doc/3?routing=1&refresh
 // CONSOLE
 // TEST[continued]
 
-The following request can be built that connects the two together:
+可以构造下面这样的请求，将两者连接在一起：
 
 [source,js]
 --------------------------------------------------
@@ -125,11 +123,12 @@ POST child_example/_search?size=0
 // CONSOLE
 // TEST[continued]
 
-<1> The `type` points to type / mapping with the name `answer`.
+<1> `type` 字段中指定了名称为 `answer` 的类型进行映射。
 
-The above example returns the top question tags and per tag the top answer owners.
 
-Possible response:
+上面的示例的返回中最上面是 question 的 tag ，每个 tag 最上面是 answer 的 owners。
+
+可能的返回:
 
 [source,js]
 --------------------------------------------------
@@ -222,5 +221,5 @@ Possible response:
 --------------------------------------------------
 // TESTRESPONSE[s/"took": 25/"took": $body.took/]
 
-<1> The number of question documents with the tag `file-transfer`, `windows-server-2003`, etc.
-<2> The number of answer documents that are related to question documents with the tag `file-transfer`, `windows-server-2003`, etc.
+<1> question 文档中具有 `file-transfer` 和 `windows-server-2003` 等等标签的文档的数量。
+<2> 与 answer 文档相关的 qustion 文档中具有 `file-transfer` 和 `windows-server-2003` 等等标签的文档的数量。
