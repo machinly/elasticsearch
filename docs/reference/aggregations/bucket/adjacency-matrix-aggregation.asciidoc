@@ -1,16 +1,13 @@
 [[search-aggregations-bucket-adjacency-matrix-aggregation]]
-=== Adjacency Matrix Aggregation
+=== 邻接矩阵(adjacency_matrix)聚合
 
-A bucket aggregation returning a form of https://en.wikipedia.org/wiki/Adjacency_matrix[adjacency matrix].
-The request provides a collection of named filter expressions, similar to the `filters` aggregation
-request. 
-Each bucket in the response represents a non-empty cell in the matrix of intersecting filters.
+一种以 https://zh.wikipedia.org/wiki/%E9%82%BB%E6%8E%A5%E7%9F%A9%E9%98%B5[邻接矩阵] 为返回形式的 bucket 聚合。
+在请求中提供了命名过滤器表达式的集合，类似于 `（过滤器）filters` 聚合的请求。
+在响应中，每个 bucket 表示邻接矩阵中的一个非空的 cell。
 
-beta[The `adjacency_matrix` aggregation is a new feature and we may evolve its design as we get feedback on its use.  As a result, the API for this feature may change in non-backwards compatible ways]
+beta[ `adjacency_matrix` 聚合是一种新特性，我们会根据实际使用中的反馈来改进这个设计。因此，该特性的 API 之后的修改可能并非向后兼容的]
 
-
-Given filters named `A`, `B` and `C` the response would return buckets with the following names:
-
+若有三个名为 `A` ，`B` 和 `C` 的过滤器，那响应中也会有三个以此命名的 bucket:
 
 [options="header"]
 |=======================
@@ -20,16 +17,12 @@ h|B |    |B   |B&C
 h|C |    |    |C  
 |=======================
 
-The intersecting buckets e.g `A&C` are labelled using a combination of the two filter names separated by
-the ampersand character. Note that the response does not also include a "C&A" bucket as this would be the
-same set of documents as "A&C". The matrix is said to be _symmetric_ so we only return half of it. To do this we sort 
-the filter name strings and always use the lowest of a pair as the value to the left of the "&" separator. 
+那些相交的 bucket 会使用两个过滤器名称的组合进行标记，在过滤器名称中间使用 & 符号分割，例如 `A&C` 。需要注意的是，响应中不会包含 `C&A` bucket，因为它和 `A&C` 是相同的一组文档。这个矩阵是 _symmetric（对称的）_ 所以我们只返回它的一半。为此，我们用过滤器进行了字符排序，并始终使用两个字符串中最小的作为 "&" 分隔符左边的值。
 
-An alternative `separator` parameter can be passed in the request if clients wish to use a separator string 
-other than the default of the ampersand.
+如果客户端希望使用其他字符串作为分割字符串来替代默认的 & 符号，可以在请求中传递一个 `separator` 参数。
 
 
-Example:
+示例:
 
 [source,js]
 --------------------------------------------------
@@ -59,12 +52,10 @@ GET emails/_search
 --------------------------------------------------
 // CONSOLE
 
-In the above example, we analyse email messages to see which groups of individuals 
-have exchanged messages.
-We will get counts for each group individually and also a count of messages for pairs
-of groups that have recorded interactions.
+在上面的示例中，我们分析了电子邮件信息，用来查询互发了邮件的几组用户。
+我们会获得一个组数量的计数，还有每组发送信息量的计数。
 
-Response:
+返回:
 
 [source,js]
 --------------------------------------------------
@@ -105,12 +96,8 @@ Response:
 // TESTRESPONSE[s/"_shards": \.\.\./"_shards": $body._shards/]
 // TESTRESPONSE[s/"hits": \.\.\./"hits": $body.hits/]
 
-==== Usage
-On its own this aggregation can provide all of the data required to create an undirected weighted graph.
-However, when used with child aggregations such as a `date_histogram` the results can provide the
-additional levels of data required to perform https://en.wikipedia.org/wiki/Dynamic_network_analysis[dynamic network analysis]
-where examining interactions _over time_ becomes important.
+==== 用途
+这种聚合本身可以提供创建无向加权图所需的所有数据。然而，当其他的子聚合一起使用时会更有价值，例如与 `date_histogram` 聚合一起使用时，其产生的结果可以为 https://en.wikipedia.org/wiki/Dynamic_network_analysis[动态网络分析] 提供额外随时间变化的交互数据。
 
-==== Limitations
-For N filters the matrix of buckets produced can be N²/2 and so there is a default maximum 
-imposed of 100 filters . This setting can be changed using the `index.max_adjacency_matrix_filters` index-level setting.
+==== 限制
+N 个过滤器可以产生 N²/2 个 bucket 矩阵，所以过滤器的数量有一个默认的最大值 100 。可以在索引级别的设置中使用 `index.max_adjacency_matrix_filters` 修改这项设置。
