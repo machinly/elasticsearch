@@ -126,7 +126,7 @@ POST child_example/_search?size=0
 <1> `type` 字段中指定了名称为 `answer` 的类型进行映射。
 
 
-上面的示例的返回中最上面是 question 的 tag ，每个 tag 最上面是 answer 的 owners。
+上面的示例的返回中最上面是 question 的 tag 字段，每个 tag 最上面是 answer 的 owner 字段。
 
 可能的返回:
 
@@ -222,4 +222,4 @@ POST child_example/_search?size=0
 // TESTRESPONSE[s/"took": 25/"took": $body.took/]
 
 <1> question 文档中具有 `file-transfer` 和 `windows-server-2003` 等等标签的文档的数量。
-<2> 与 answer 文档相关的 qustion 文档中具有 `file-transfer` 和 `windows-server-2003` 等等标签的文档的数量。
+<2> 与 qustion 文档中具有 `file-transfer` 和 `windows-server-2003` 等等标签的 answer 文档的数量。
