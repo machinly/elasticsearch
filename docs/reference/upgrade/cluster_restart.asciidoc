@@ -26,6 +26,9 @@ recovery.
 include::synced-flush.asciidoc[]
 --
 
+. *Stop any machine learning jobs that are running.* See
+{xpack-ref}/stopping-ml.html[Stopping Machine Learning].
+
 . *Shutdown all nodes.*
 +
 --
@@ -33,6 +36,10 @@ include::shut-down-node.asciidoc[]
 --
 
 . *Upgrade all nodes.*
++
+--
+include::remove-xpack.asciidoc[]
+--
 +
 --
 include::upgrade-node.asciidoc[]
@@ -88,14 +95,15 @@ already have local shard copies.
 +
 --
 When all nodes have joined the cluster and recovered their primary shards,
-reenable allocation.
+reenable allocation by restoring `cluster.routing.allocation.enable` to its
+default:
 
 [source,js]
 ------------------------------------------------------
 PUT _cluster/settings
 {
   "persistent": {
-    "cluster.routing.allocation.enable": "all"
+    "cluster.routing.allocation.enable": null
   }
 }
 ------------------------------------------------------
@@ -118,3 +126,5 @@ GET _cat/recovery
 --------------------------------------------------
 // CONSOLE
 --
+
+. *Restart machine learning jobs.*

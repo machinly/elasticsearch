@@ -19,7 +19,11 @@ the limit will fail with an exception.
 
 include::bucket/adjacency-matrix-aggregation.asciidoc[]
 
+include::bucket/autodatehistogram-aggregation.asciidoc[]
+
 include::bucket/children-aggregation.asciidoc[]
+
+include::bucket/composite-aggregation.asciidoc[]
 
 include::bucket/datehistogram-aggregation.asciidoc[]
 
@@ -45,6 +49,8 @@ include::bucket/missing-aggregation.asciidoc[]
 
 include::bucket/nested-aggregation.asciidoc[]
 
+include::bucket/parent-aggregation.asciidoc[]
+
 include::bucket/range-aggregation.asciidoc[]
 
 include::bucket/reverse-nested-aggregation.asciidoc[]
@@ -56,6 +62,4 @@ include::bucket/significantterms-aggregation.asciidoc[]
 include::bucket/significanttext-aggregation.asciidoc[]
 
 include::bucket/terms-aggregation.asciidoc[]
-
-include::bucket/composite-aggregation.asciidoc[]
 
