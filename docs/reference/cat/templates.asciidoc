@@ -1,18 +1,25 @@
 [[cat-templates]]
 == cat templates
 
-The `templates` command provides information about existing templates.
+`templates` 命令提供了现有模板的信息。
 
 [source,js]
 --------------------------------------------------
 GET /_cat/templates?v&s=name
 --------------------------------------------------
 // CONSOLE
+// TEST[s/templates/templates\/template*/]
 // TEST[s/^/PUT _template\/template0\n{"index_patterns": "te*", "order": 0}\n/]
 // TEST[s/^/PUT _template\/template1\n{"index_patterns": "tea*", "order": 1}\n/]
 // TEST[s/^/PUT _template\/template2\n{"index_patterns": "teak*", "order": 2, "version": 7}\n/]
+// The substitions do two things:
+// 1. Filter the response to just templates matching the te* pattern
+//    so that we only get the templates we expect regardless of which
+//    templates exist. If xpack is installed there will be unexpected
+//    templates.
+// 2. Create some templates to expect in the response.
 
-which looks like
+如下显示
 
 [source,txt]
 --------------------------------------------------
@@ -23,9 +30,6 @@ template2 [teak*]        2     7
 --------------------------------------------------
 // TESTRESPONSE[s/\*/\\*/ s/\[/\\[/ s/\]/\\]/ _cat]
 
-The output shows that there are three existing templates,
-with template2 having a version value.
+输出显示三个现有模板， template2 具有版本值。
 
-The endpoint also supports giving a template name or pattern in the url
-to filter the results, for example `/_cat/templates/template*` or
-`/_cat/templates/template0`.
+endpoint 还支持在 URL 中提供模板名称或 pattern 以过滤结果，例如 `/_cat/templates/template*` 或者 `/_cat/templates/template0` 。
