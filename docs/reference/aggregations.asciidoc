@@ -25,6 +25,10 @@
 
 NOTE:   分桶聚合可以有子聚合（分桶聚合或指标聚合）。子聚合将对父聚合生成的 bucket 内容进行运算。聚合嵌套的级别或深度没有强制限制（可以将聚合嵌套在“父”聚合之下，而“父”聚合本身也是另一个高级别聚合的子聚合）。
 
+NOTE:   Aggregations operate on the `double` representation of
+        the data. As a consequence, the result may be approximate when running on longs
+        whose absolute value is greater than `2^53`.
+
 [float]
 == 聚合的结构
 
