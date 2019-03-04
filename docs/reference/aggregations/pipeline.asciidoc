@@ -1,48 +1,39 @@
 [[search-aggregations-pipeline]]
 
-== 管道聚合（Pipeline Aggregations）
+== Pipeline（管道）聚合
 
-管道聚合工作在其他聚合输出生成物的地方，而不是直接处理文档，它用于向输出树中添加信息。管道聚合有很多不同的类型，它们为其他聚合处理各种各样的信息，但是这么多的类型可以大致分为两类：
+pipeline 聚合工作在其他聚合输出生成物的地方，而不是直接处理文档，它用于向输出树中添加信息。pipeline 聚合有很多不同的类型，它们为其他聚合处理各种各样的信息，但是这么多的类型可以大致分为两类：
 
-_（父辈）Parent_::
-                这类管道聚合包含了父聚合的输出，它可以为已经存在的 bucket 添加新计算的 bucket 或者新的聚合。
-_（同辈）Sibling_::
-                这一类管道聚合会提供同辈聚合的输出，同时它可以计算一个新的聚合，新的聚合会在作为同辈聚合出现在同一级。
+_Parent（父辈）_::
+                这类管道聚合包含了 paraent 聚合的输出，它可以为已经存在的 bucket 添加新计算的 bucket 或者新的聚合。
+_Sibling（同辈）_::
+                这一类管道聚合会提供 sibling 聚合的输出，同时它可以计算一个新的聚合，新的聚合会在作为 sibling 聚合出现在同一级。
 
-Pipeline aggregations can reference the aggregations they need to perform their computation by using the `buckets_path`
-parameter to indicate the paths to the required metrics. The syntax for defining these paths can be found in the
-<<buckets-path-syntax, `buckets_path` Syntax>> section below.
+pipeline 聚合可以通过使用 `buckets_path` 参数来指定执行计算指标所需聚合的路径。定义这些路径的语法可以在下面的 <<buckets-path-syntax, `buckets_path` 语法>> 部分找到。
 
-Pipeline aggregations cannot have sub-aggregations but depending on the type it can reference another pipeline in the `buckets_path`
-allowing pipeline aggregations to be chained.  For example, you can chain together two derivatives to calculate the second derivative
-(i.e. a derivative of a derivative).
+pipeline 聚合不能使用子聚合，但是它根据类型的区分可以使用 `buckets_path` 来链接其他 pipeline 聚合。例如，你可以链接其他两个导数计算二阶导数（即导数的导数）。
 
-NOTE: Because pipeline aggregations only add to the output, when chaining pipeline aggregations the output of each pipeline aggregation
-will be included in the final output.
+NOTE: 由于 pipeline 聚合仅将数据合并输出，因此在链接 pipeline 聚合时，最终输出将包含每个 pipeline 聚合的输出。
 
 [[buckets-path-syntax]]
 [float]
-=== `buckets_path` Syntax
+=== `buckets_path` 语法
 
-Most pipeline aggregations require another aggregation as their input.  The input aggregation is defined via the `buckets_path`
-parameter, which follows a specific format:
+大多数 pipeline 聚合需要另一个聚合作为输入。输入聚合是通过 `buckets_path` 参数定义的，该参数遵循特定的格式：
 
-// https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_Form
+// https://zh.wikipedia.org/wiki/%E6%89%A9%E5%B1%95%E5%B7%B4%E7%A7%91%E6%96%AF%E8%8C%83%E5%BC%8F
 [source,ebnf]
 --------------------------------------------------
 AGG_SEPARATOR       =  '>' ;
 METRIC_SEPARATOR    =  '.' ;
-AGG_NAME            =  <the name of the aggregation> ;
-METRIC              =  <the name of the metric (in case of multi-value metrics aggregation)> ;
+AGG_NAME            =  <聚合的名称> ;
+METRIC              =  <指标的名称(对于多指标聚合)> ;
 PATH                =  <AGG_NAME> [ <AGG_SEPARATOR>, <AGG_NAME> ]* [ <METRIC_SEPARATOR>, <METRIC> ] ;
 --------------------------------------------------
 
-For example, the path `"my_bucket>my_stats.avg"` will path to the `avg` value in the `"my_stats"` metric, which is
-contained in the `"my_bucket"` bucket aggregation.
+例如，路径 `"my_bucket>my_stats.avg"` 会将 `avg` 的值指定为 `"my_stats"` 的指标，它包含在名为 `“my_bucket”` 的 bucket 聚合中。
 
-Paths are relative from the position of the pipeline aggregation; they are not absolute paths, and the path cannot go back "up" the
-aggregation tree. For example, this moving average is embedded inside a date_histogram and refers to a "sibling"
-metric `"the_sum"`:
+path 参数是对 pipline 聚合的相对位置；参数中不能填入绝对路径，而且路径无法被上一级的聚合调用。例如，这个移动平均值嵌入到了一个 date_histogram 中，并且引用了一个 sibling 聚合的指标 `"the_sum"`：
 
 [source,js]
 --------------------------------------------------
@@ -67,12 +58,10 @@ POST /_search
 }
 --------------------------------------------------
 // CONSOLE
-<1> The metric is called `"the_sum"`
-<2> The `buckets_path` refers to the metric via a relative path `"the_sum"`
+<1> 这个指标名称为 `"the_sum"`
+<2> `buckets_path` 通过相对路径引用 `"the_sum"` 
 
-`buckets_path` is also used for Sibling pipeline aggregations, where the aggregation is "next" to a series of buckets
-instead of embedded "inside" them.  For example, the `max_bucket` aggregation uses the `buckets_path` to specify
-a metric embedded inside a sibling aggregation:
+`buckets_path` 也可用于 sibling pipeline 聚合，这些聚合会变成 bucket 的“下一个”聚合，而不是嵌入到这些 bucket 中。例如，`max_bucket` 聚合使用 `buckets_path` 指定了嵌入到 sibling 聚合中的指标：
 
 [source,js]
 --------------------------------------------------
@@ -102,11 +91,12 @@ POST /_search
 --------------------------------------------------
 // CONSOLE
 // TEST[setup:sales]
-<1> `buckets_path` instructs this max_bucket aggregation that we want the maximum value of the `sales` aggregation in the
+<1> `buckets_path` 指定了使用 `max_bucket` 聚合嵌入到 `sales_per_month` 日期直方图中，这个聚合会取出 `sales` 聚合中的最大值。
+`buckets_path` instructs this max_bucket aggregation that we want the maximum value of the `sales` aggregation in the
 `sales_per_month` date histogram.
 
 [float]
-=== Special Paths
+=== 特殊路径
 
 Instead of pathing to a metric, `buckets_path` can use a special `"_count"` path.  This instructs
 the pipeline aggregation to use the document count as it's input.  For example, a moving average can be calculated on the document count of each bucket, instead of a specific metric:
