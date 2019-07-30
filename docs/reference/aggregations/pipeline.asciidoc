@@ -62,7 +62,7 @@ POST /_search
 <1> 这个指标名称为 `"the_sum"`
 <2> The `buckets_path` 通过相对路径引用 `"the_sum"` 
 
-`buckets_path` 也可用于 sibling pipeline 聚合，这些聚合会变成 bucket 的“下一个”聚合，而不是嵌入到这些 bucket 中。例如，`max_bucket` 聚合使用 `buckets_path` 指定了嵌入到 sibling 聚合中的指标：
+`buckets_path` 也可用于 sibling pipeline 聚合，这些聚合会变成 bucket 的 "next" 聚合，而不是嵌入到这些 bucket 中。例如，`max_bucket` 聚合使用 `buckets_path` 指定了嵌入到 sibling 聚合中的指标：
 
 [source,js]
 --------------------------------------------------
@@ -99,8 +99,7 @@ POST /_search
 [float]
 === 特殊路径
 
-Instead of pathing to a metric, `buckets_path` can use a special `"_count"` path.  This instructs
-the pipeline aggregation to use the document count as its input.  For example, a moving average can be calculated on the document count of each bucket, instead of a specific metric:
+`buckets_path` 可以使用一个特殊的 `"_count"` 路径，它可以将路径替换为一个指标。这将使用 pipline aggregation 文档的 count 值作为输入参数。例如，可以用每个 bucket 的文档数量来计算移动平均值，而不是用一个特定的指标。
 
 [source,js]
 --------------------------------------------------
@@ -122,12 +121,10 @@ POST /_search
 }
 --------------------------------------------------
 // CONSOLE
-// TEST[warning:The moving_avg aggregation has been deprecated in favor of the moving_fn aggregation.]
-<1> By using `_count` instead of a metric name, we can calculate the moving average of document counts in the histogram
+// TEST[warning: moving_avg 聚合已经被废弃了，取而代之的是 moving_fn 聚合。]
+<1> 通过使用 `_count` 替换指标名，我们可以计算直方图中的文档数量的移动平均值。
 
-The `buckets_path` can also use `"_bucket_count"` and path to a multi-bucket aggregation to use the number of buckets
-returned by that aggregation in the pipeline aggregation instead of a metric. for example a `bucket_selector` can be
-used here to filter out buckets which contain no buckets for an inner terms aggregation:
+`buckets_path` 也可以使用 `_bucket_count` 和多桶聚合的路径，以使该聚合在管道聚合中返回桶数，而不是返回一个指标。例如，可以在此处使用 `bucket_selector` 过滤掉不包含 terms 聚合的 bucket：
 
 [source,js]
 --------------------------------------------------
@@ -163,17 +160,14 @@ POST /sales/_search
 --------------------------------------------------
 // CONSOLE
 // TEST[setup:sales]
-<1> By using `_bucket_count` instead of a metric name, we can filter out `histo` buckets where they contain no buckets
-for the `categories` aggregation
+<1> By using `_bucket_count` instead of a metric name, we can filter out `histo` buckets where they contain no buckets for the `categories` aggregation
+<1> 通过使用 `_bucket_count` 而不是度量名，我们可以过滤掉 `histo` bucket 中不包含 `categories` 聚合的 bucket。
 
 [[dots-in-agg-names]]
 [float]
-=== Dealing with dots in agg names
+=== 处理聚合名称中的点
 
-An alternate syntax is supported to cope with aggregations or metrics which
-have dots in the name, such as the ++99.9++th
-<<search-aggregations-metrics-percentile-aggregation,percentile>>. This metric
-may be referred to as:
+有一种替代的语法用来支持在聚合或指标名称中加入点，比如 ++99.9++th<<search-aggregations-metrics-percentile-aggregation,百分位数>>。这种指标课参考如下格式:
 
 [source,js]
 ---------------
@@ -183,16 +177,14 @@ may be referred to as:
 
 [[gap-policy]]
 [float]
-=== Dealing with gaps in the data
+=== 处理数据中的空值
 
-Data in the real world is often noisy and sometimes contains *gaps* -- places where data simply doesn't exist.  This can
-occur for a variety of reasons, the most common being:
+现实世界的数据通常是嘈杂的，有些数据中可能会包含空值 -- 数据根本不存在。这可能有各种各样的原因，最常见的是：
 
-* Documents falling into a bucket do not contain a required field
-* There are no documents matching the query for one or more buckets
-* The metric being calculated is unable to generate a value, likely because another dependent bucket is missing a value.
-Some pipeline aggregations have specific requirements that must be met (e.g. a derivative cannot calculate a metric for the
-first value because there is no previous value, HoltWinters moving average need "warmup" data to begin calculating, etc)
+* 文档落入的 bucket 没有包含所需的字段
+* 一个或多个 bucket 没有匹配到文档 holtwinters
+* 正在计算的指标无法生成值，这可能是因为另一个相关 bucket 的值丢失了。
+一些管道聚合有必须满足的特定要求(例如，由于没有第一个值，无法对第一个指标进行求导，HoltWinters 移动平均线需要“预热”数据才能开始计算，等等)
 
 Gap policies are a mechanism to inform the pipeline aggregation about the desired behavior when "gappy" or missing
 data is encountered.  All pipeline aggregations accept the `gap_policy` parameter.  There are currently two gap policies
