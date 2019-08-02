@@ -5,9 +5,9 @@
 pipeline 聚合工作在其他聚合输出生成物的地方，而不是直接处理文档，它用于向输出树中添加信息。pipeline 聚合有很多不同的类型，它们为其他聚合处理各种各样的信息，但是这么多的类型可以大致分为两类：
 
 _Parent（父辈）_::
-                这类管道聚合包含了 paraent 聚合的输出，它可以为已经存在的 bucket 添加新计算的 bucket 或者新的聚合。
+                这类 pipeline 聚合包含了 paraent 聚合的输出，它可以为已经存在的 bucket 添加新计算的 bucket 或者新的聚合。
 _Sibling（同辈）_::
-                这一类管道聚合会提供 sibling 聚合的输出，同时它可以计算一个新的聚合，新的聚合会在作为 sibling 聚合出现在同一级。
+                这一类 pipeline 聚合会提供 sibling 聚合的输出，同时它可以计算一个新的聚合，新的聚合会在作为 sibling 聚合出现在同一级。
 
 pipeline 聚合可以通过使用 `buckets_path` 参数来指定执行计算指标所需聚合的路径。定义这些路径的语法可以在下面的 <<buckets-path-syntax, `buckets_path` 语法>> 部分找到。
 
@@ -124,7 +124,7 @@ POST /_search
 // TEST[warning: moving_avg 聚合已经被废弃了，取而代之的是 moving_fn 聚合。]
 <1> 通过使用 `_count` 替换指标名，我们可以计算直方图中的文档数量的移动平均值。
 
-`buckets_path` 也可以使用 `_bucket_count` 和多桶聚合的路径，以使该聚合在管道聚合中返回桶数，而不是返回一个指标。例如，可以在此处使用 `bucket_selector` 过滤掉不包含 terms 聚合的 bucket：
+`buckets_path` 也可以使用 `_bucket_count` 和多桶聚合的路径，以使该聚合在 pipeline 聚合中返回桶数，而不是返回一个指标。例如，可以在此处使用 `bucket_selector` 过滤掉不包含 terms 聚合的 bucket：
 
 [source,js]
 --------------------------------------------------
@@ -183,9 +183,9 @@ POST /sales/_search
 
 * 文档落入的 bucket 没有包含所需的字段
 * 一个或多个 bucket 没有匹配到文档 holtwinters
-* 可能因为一个相关 bucket 的值丢失了，导致正在计算的指标无法生成值。有的管道聚合必须满足一些特定的要求(例如，由于没有第一个值，无法对第一个指标进行求导，HoltWinters 移动平均线需要 “预热” 数据才能开始计算，等等)
+* 可能因为一个相关 bucket 的值丢失了，导致正在计算的指标无法生成值。有的 pipeline 聚合必须满足一些特定的要求(例如，由于没有第一个值，无法对第一个指标进行求导，HoltWinters 移动平均线需要 “预热” 数据才能开始计算，等等)
 
-Gap 策略是管道聚合的一种处理数据缺失的机制。所有管道聚合都可以接受 "gap_policy" 参数。目前有两种 gap 策略可供选择:
+Gap 策略是 pipeline 聚合的一种处理数据缺失的机制。所有 pipeline 聚合都可以接受 "gap_policy" 参数。目前有两种 gap 策略可供选择:
 
 _skip_::
                 此选项将缺少的数据视为 bucket 不存在。它将跳过 bucket 并继续使用下一个可用的值进行计算。
@@ -193,7 +193,7 @@ _skip_::
 _insert_zeros_::
                 This option will replace missing values with a zero (`0`) and pipeline aggregation computation will
                 proceed as normal.
-                此选项将用 (`0`) 替换缺失的值，以保证管道聚合计算正常进行。
+                此选项将用 (`0`) 替换缺失的值，以保证 pipeline 聚合计算正常进行。
 
 
 
